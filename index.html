@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HXE-AIV8 Admin</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script>
+tailwind.config={theme:{extend:{colors:{hxe:{bg:'#060a10',sf:'#0c1220',card:'#111a2e',border:'#1a2744',accent:'#00e5ff',green:'#00e676',red:'#ff1744',yellow:'#ffab00',orange:'#ff6d00',txt:'#e0e8f5',dim:'#5a6f8f',bright:'#f4f8ff',purple:'#b388ff'}},fontFamily:{display:['Space Grotesk','sans-serif'],mono:['JetBrains Mono','monospace']}}}}
+</script>
+<style>
+:root{--accent:#00e5ff}
+*{scrollbar-width:thin;scrollbar-color:#1a2744 transparent}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#1a2744;border-radius:3px}
+body{font-family:'Space Grotesk',sans-serif;background:#060a10;color:#e0e8f5;overflow:hidden;height:100vh}
+.lb{position:fixed;inset:0;z-index:0;overflow:hidden}
+.lb::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(0,229,255,.07) 0%,transparent 70%);top:-100px;right:-100px;animation:f1 8s ease-in-out infinite}
+.lb::after{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(255,109,0,.05) 0%,transparent 70%);bottom:-150px;left:-100px;animation:f2 10s ease-in-out infinite}
+@keyframes f1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40px,60px) scale(1.1)}}
+@keyframes f2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(50px,-40px) scale(1.15)}}
+.gl{background:rgba(17,26,46,.85);backdrop-filter:blur(20px);border:1px solid rgba(26,39,68,.6);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.hi{background:rgba(6,10,16,.7);border:1px solid #1a2744;color:#e0e8f5;transition:all .25s;font-family:'Space Grotesk',sans-serif}
+.hi:focus{outline:none;border-color:#00e5ff;box-shadow:0 0 0 3px rgba(0,229,255,.1)}
+.hi::placeholder{color:#3a4f6f}
+.ba{background:linear-gradient(135deg,#00e5ff,#00b0ff);color:#060a10;font-weight:700;transition:all .25s;box-shadow:0 4px 15px rgba(0,229,255,.2);cursor:pointer}
+.ba:hover{transform:translateY(-1px);box-shadow:0 6px 25px rgba(0,229,255,.35)}
+.ba:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.bgt{border:1px solid #1a2744;color:#5a6f8f;transition:all .2s;cursor:pointer}.bgt:hover{border-color:#00e5ff;color:#00e5ff;background:rgba(0,229,255,.05)}
+.bdr{background:rgba(255,23,68,.12);color:#ff1744;border:1px solid rgba(255,23,68,.2);transition:all .2s;cursor:pointer}.bdr:hover{background:rgba(255,23,68,.25)}
+.bpr{background:rgba(179,136,255,.12);color:#b388ff;border:1px solid rgba(179,136,255,.2);transition:all .2s;cursor:pointer}.bpr:hover{background:rgba(179,136,255,.25)}
+.sbar{background:rgba(12,18,32,.95);backdrop-filter:blur(10px);border-right:1px solid #1a2744}
+.ni{transition:all .2s;position:relative;overflow:hidden;cursor:pointer}
+.ni::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#00e5ff;transform:scaleY(0);transition:transform .2s}
+.ni:hover{background:rgba(0,229,255,.05);color:#e0e8f5}
+.ni.act{background:rgba(0,229,255,.08);color:#00e5ff}.ni.act::before{transform:scaleY(1)}
+.bdg{padding:2px 10px;border-radius:9999px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;display:inline-block}
+.b-a{background:rgba(0,230,118,.12);color:#00e676}.b-e{background:rgba(255,171,0,.12);color:#ffab00}
+.b-d{background:rgba(255,23,68,.12);color:#ff1744}.b-h{background:rgba(255,109,0,.12);color:#ff6d00}
+.b-r{background:rgba(179,136,255,.12);color:#b388ff}.b-l{background:rgba(0,229,255,.12);color:#00e5ff}
+.sc{position:relative;overflow:hidden}
+.sc::after{content:'';position:absolute;top:-50%;right:-50%;width:100%;height:100%;background:radial-gradient(circle,rgba(0,229,255,.04) 0%,transparent 70%);opacity:0;transition:opacity .3s}
+.sc:hover::after{opacity:1}
+.dt th{color:#5a6f8f;font-weight:600;text-transform:uppercase;letter-spacing:.8px;font-size:10px;border-bottom:1px solid #1a2744;white-space:nowrap}
+.dt td{border-bottom:1px solid rgba(26,39,68,.4)}
+.dt tr:hover td{background:rgba(0,229,255,.02)}
+.tst{animation:ti .35s ease-out}@keyframes ti{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.tso{animation:too .3s ease-in forwards}@keyframes too{to{transform:translateX(120%);opacity:0}}
+.movl{background:rgba(6,10,16,.8);backdrop-filter:blur(4px);animation:fi .2s}
+.mbox{animation:mi .3s ease-out}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+@keyframes mi{from{transform:scale(.95) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.pdot{width:8px;height:8px;border-radius:50%;animation:pu 2s infinite}@keyframes pu{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.5)}}
+.pge{animation:pi .3s ease-out}@keyframes pi{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.cdwn{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.5px}
+.sel{background:rgba(6,10,16,.7);border:1px solid #1a2744;color:#e0e8f5;padding:8px 12px;border-radius:8px;font-size:13px;transition:all .25s;appearance:none;font-family:'Space Grotesk',sans-serif;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%235a6f8f' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.sel:focus{outline:none;border-color:#00e5ff;box-shadow:0 0 0 3px rgba(0,229,255,.1)}
+.cbadge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:9999px;font-size:11px;font-weight:600}
+.cb-ok{background:rgba(0,230,118,.1);color:#00e676;border:1px solid rgba(0,230,118,.2)}
+.cb-no{background:rgba(255,23,68,.1);color:#ff1744;border:1px solid rgba(255,23,68,.2)}
+.filter-tab{transition:all .2s;cursor:pointer;padding:6px 16px;border-radius:9999px;font-size:12px;font-weight:600}
+.filter-tab:hover{background:rgba(0,229,255,.05)}
+.filter-tab.active{background:rgba(0,229,255,.12);color:#00e5ff;border:1px solid rgba(0,229,255,.2)}
+@media(prefers-reduced-motion:reduce){*{animation-duration:0s!important;transition-duration:0s!important}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="LS" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+<div class="lb"></div>
+<div class="gl rounded-2xl w-full max-w-md p-8 relative z-10">
+  <div class="text-center mb-8">
+    <div class="inline-flex items-center gap-2 mb-3">
+      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-hxe-accent to-blue-500 flex items-center justify-center"><i class="fa-solid fa-bolt text-hxe-bg text-lg"></i></div>
+      <span class="text-2xl font-extrabold tracking-tight text-hxe-bright">HYPERSENSE<span class="text-hxe-accent">INDIA</span></span>
+    </div>
+    <p class="text-hxe-dim text-sm">Admin Control Panel</p>
+    <p class="text-hxe-dim text-xs mt-1">Dev: AG HYDRAX FF</p>
+  </div>
+  <label class="block text-xs font-semibold text-hxe-dim uppercase tracking-wider mb-2">Username</label>
+  <input id="lU" type="text" class="hi w-full rounded-lg px-4 py-3 text-sm mb-3" placeholder="Admin username" value="HYDRA">
+  <label class="block text-xs font-semibold text-hxe-dim uppercase tracking-wider mb-2">Password</label>
+  <input id="lP" type="password" class="hi w-full rounded-lg px-4 py-3 text-sm mb-4" placeholder="Password" value="" onkeydown="if(event.key==='Enter')loginAdmin()">
+  <button id="lBtn" onclick="loginAdmin()" class="ba w-full rounded-lg py-3 text-sm"><i class="fa-solid fa-right-to-bracket mr-2"></i>Login</button>
+  <div id="lE" class="hidden mt-3 p-3 rounded-lg bg-hxe-red/10 border border-hxe-red/20 text-hxe-red text-xs"></div>
+</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="MA" class="hidden h-screen flex">
+<aside class="sbar w-56 flex-shrink-0 flex flex-col">
+  <div class="p-5 flex items-center gap-2 border-b border-hxe-border"><div class="w-8 h-8 rounded-md bg-gradient-to-br from-hxe-accent to-blue-500 flex items-center justify-center"><i class="fa-solid fa-bolt text-hxe-bg text-sm"></i></div><div><div class="text-sm font-bold text-hxe-bright leading-none">HXE-AIV8</div><div class="text-[10px] text-hxe-dim">Admin</div></div></div>
+  <nav class="flex-1 py-4 px-3 space-y-1">
+    <button onclick="switchPage('dash')" class="ni act w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center gap-3" data-p="dash"><i class="fa-solid fa-chart-pie w-5 text-center"></i>Dashboard</button>
+    <button onclick="switchPage('users')" class="ni w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center gap-3" data-p="users"><i class="fa-solid fa-users w-5 text-center"></i>Users</button>
+    <button onclick="switchPage('resellers')" class="ni w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center gap-3" data-p="resellers"><i class="fa-solid fa-store w-5 text-center"></i>Resellers</button>
+    <button onclick="switchPage('settings')" class="ni w-full text-left px-3 py-2.5 rounded-lg text-sm flex items-center gap-3" data-p="settings"><i class="fa-solid fa-gear w-5 text-center"></i>Settings</button>
+  </nav>
+  <div class="p-4 border-t border-hxe-border">
+    <div class="flex items-center gap-2 mb-3"><div class="w-8 h-8 rounded-full bg-hxe-card flex items-center justify-center"><i class="fa-solid fa-user-shield text-hxe-accent text-xs"></i></div><div class="flex-1 min-w-0"><div id="sU" class="text-xs font-semibold text-hxe-txt truncate">Admin</div><div class="text-[10px] text-hxe-dim">Administrator</div></div></div>
+    <button onclick="logoutAdmin()" class="bgt w-full rounded-lg py-2 text-xs"><i class="fa-solid fa-arrow-right-from-bracket mr-1"></i>Logout</button>
+  </div>
+</aside>
+<main class="flex-1 overflow-y-auto">
+  <header class="sticky top-0 z-10 bg-hxe-bg/80 backdrop-blur-md border-b border-hxe-border px-8 py-4 flex items-center justify-between">
+    <h1 id="pT" class="text-lg font-bold text-hxe-bright">Dashboard</h1>
+    <div class="flex items-center gap-3">
+      <div id="cBadge" class="cbadge cb-ok"><div class="pdot bg-hxe-green"></div>Connected</div>
+      <button onclick="refreshData()" class="bgt rounded-lg px-3 py-1.5 text-xs"><i class="fa-solid fa-arrows-rotate mr-1"></i>Refresh</button>
+    </div>
+  </header>
+
+  <!-- DASHBOARD -->
+  <div id="pDash" class="pge p-8">
+    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8" id="sG"></div>
+    <div class="gl rounded-xl p-6"><div class="flex items-center justify-between mb-4"><h2 class="text-sm font-bold text-hxe-txt">Recent Users</h2><button onclick="switchPage('users')" class="text-xs text-hxe-accent hover:underline cursor-pointer">View All</button></div><div id="rU" class="overflow-x-auto"></div></div>
+  </div>
+
+  <!-- USERS -->
+  <div id="pUsers" class="pge p-8 hidden">
+    <div class="gl rounded-xl p-6 mb-6">
+      <h2 class="text-sm font-bold text-hxe-txt mb-4"><i class="fa-solid fa-user-plus text-hxe-accent mr-2"></i>Create User</h2>
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+        <div><label class="block text-xs text-hxe-dim mb-1">Username</label><input id="cUN" type="text" class="hi w-full rounded-lg px-3 py-2.5 text-sm" placeholder="Username"></div>
+        <div><label class="block text-xs text-hxe-dim mb-1">Password</label><input id="cPW" type="text" class="hi w-full rounded-lg px-3 py-2.5 text-sm" placeholder="Password"></div>
+        <div><label class="block text-xs text-hxe-dim mb-1">Expiry</label><select id="cEX" class="sel w-full rounded-lg"><option value="604800000">7 Days</option><option value="1296000000">15 Days</option><option value="2592000000" selected>30 Days</option><option value="7776000000">90 Days</option><option value="31536000000">1 Year</option><option value="0">Lifetime</option></select></div>
+        <div><label class="block text-xs text-hxe-dim mb-1">Note</label><input id="cNT" type="text" class="hi w-full rounded-lg px-3 py-2.5 text-sm" placeholder="Optional note"></div>
+        <div><button onclick="createUser()" class="ba rounded-lg py-2.5 text-sm w-full"><i class="fa-solid fa-plus mr-2"></i>Create</button></div>
+      </div>
+    </div>
+    
+    <!-- FILTER TABS -->
+    <div class="flex flex-wrap gap-2 mb-4">
+      <button onclick="setFilter('all')" class="filter-tab active" data-filter="all"><i class="fa-solid fa-list mr-1"></i>All</button>
+      <button onclick="setFilter('active')" class="filter-tab" data-filter="active"><i class="fa-solid fa-circle-check mr-1 text-hxe-green"></i>Active</button>
+      <button onclick="setFilter('expired')" class="filter-tab" data-filter="expired"><i class="fa-solid fa-clock mr-1 text-hxe-yellow"></i>Expired</button>
+      <button onclick="setFilter('locked')" class="filter-tab" data-filter="locked"><i class="fa-solid fa-lock mr-1 text-hxe-red"></i>Locked (HWID)</button>
+      <button onclick="setFilter('reseller')" class="filter-tab" data-filter="reseller"><i class="fa-solid fa-store mr-1 text-hxe-purple"></i>Reseller Created</button>
+      <button onclick="setFilter('admin')" class="filter-tab" data-filter="admin"><i class="fa-solid fa-user-shield mr-1 text-hxe-accent"></i>Admin Created</button>
+    </div>
+
+    <div class="mb-4"><input id="uS" type="text" class="hi w-full rounded-lg px-4 py-2 text-sm" placeholder="Search users..." oninput="renderUsers()"></div>
+    <div class="gl rounded-xl overflow-hidden"><div class="overflow-x-auto"><table class="dt w-full text-sm"><thead><tr class="text-left"><th class="px-4 py-3">Username</th><th class="px-4 py-3">Password</th><th class="px-4 py-3">Status</th><th class="px-4 py-3">Expiry</th><th class="px-4 py-3">HWID</th><th class="px-4 py-3">Note</th><th class="px-4 py-3">Source</th><th class="px-4 py-3">Created</th><th class="px-4 py-3 text-right">Actions</th></tr></thead><tbody id="uB"></tbody></table></div><div id="uE" class="hidden text-center py-12 text-hxe-dim text-sm"><i class="fa-solid fa-users text-3xl mb-3 block opacity-30"></i>No users</div></div>
+  </div>
+
+  <!-- RESELLERS -->
+  <div id="pResellers" class="pge p-8 hidden">
+    <div class="gl rounded-xl p-6 mb-6">
+      <h2 class="text-sm font-bold text-hxe-txt mb-4"><i class="fa-solid fa-store text-hxe-purple mr-2"></i>Create Reseller</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <div><label class="block text-xs text-hxe-dim mb-1">Username</label><input id="rCN" type="text" class="hi w-full rounded-lg px-3 py-2.5 text-sm" placeholder="Reseller username"></div>
+        <div><label class="block text-xs text-hxe-dim mb-1">Password</label><input id="rCP" type="text" class="hi w-full rounded-lg px-3 py-2.5 text-sm" placeholder="Password"></div>
+        <div><label class="block text-xs text-hxe-dim mb-1">Key Limit</label><input id="rCL" type="number" min="1" value="50" class="hi w-full rounded-lg px-3 py-2.5 text-sm"></div>
+        <div><button onclick="createReseller()" class="bpr rounded-lg py-2.5 text-sm w-full"><i class="fa-solid fa-plus mr-2"></i>Create</button></div>
+      </div>
+    </div>
+    <h2 class="text-sm font-bold text-hxe-txt mb-4">Reseller Accounts</h2>
+    <div class="gl rounded-xl overflow-hidden"><div class="overflow-x-auto"><table class="dt w-full text-sm"><thead><tr class="text-left"><th class="px-4 py-3">Username</th><th class="px-4 py-3">Password</th><th class="px-4 py-3">Limit</th><th class="px-4 py-3">Used</th><th class="px-4 py-3">Remaining</th><th class="px-4 py-3">Status</th><th class="px-4 py-3 text-right">Actions</th></tr></thead><tbody id="rB"></tbody></table></div><div id="rE" class="hidden text-center py-12 text-hxe-dim text-sm"><i class="fa-solid fa-store text-3xl mb-3 block opacity-30"></i>No resellers</div></div>
+    <h2 class="text-sm font-bold text-hxe-txt mt-8 mb-4">Reseller Activity</h2>
+    <div class="gl rounded-xl overflow-hidden"><div class="overflow-x-auto"><table class="dt w-full text-sm"><thead><tr class="text-left"><th class="px-4 py-3">Reseller</th><th class="px-4 py-3">User</th><th class="px-4 py-3">Password</th><th class="px-4 py-3">Note</th><th class="px-4 py-3">Expiry</th><th class="px-4 py-3">Time</th></tr></thead><tbody id="rLB"></tbody></table></div><div id="rLE" class="hidden text-center py-12 text-hxe-dim text-sm">No activity</div></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="pSettings" class="pge p-8 hidden">
+    <div class="max-w-2xl space-y-6">
+      <div class="gl rounded-xl p-6">
+        <h2 class="text-sm font-bold text-hxe-txt mb-4"><i class="fa-solid fa-user-pen text-hxe-accent mr-2"></i>Change Password</h2>
+        <div class="space-y-3">
+          <input id="sOP" type="password" class="hi w-full rounded-lg px-4 py-2.5 text-sm" placeholder="Current password">
+          <input id="sNP" type="password" class="hi w-full rounded-lg px-4 py-2.5 text-sm" placeholder="New password">
+          <input id="sN2" type="password" class="hi w-full rounded-lg px-4 py-2.5 text-sm" placeholder="Confirm new password">
+          <button onclick="changeAdminPassword()" class="ba rounded-lg px-6 py-2.5 text-sm">Update</button>
+        </div>
+      </div>
+      <div class="gl rounded-xl p-6 border-hxe-red/20">
+        <h2 class="text-sm font-bold text-hxe-red mb-2"><i class="fa-solid fa-skull-crossbones mr-2"></i>Danger Zone</h2>
+        <p class="text-hxe-dim text-xs mb-4">Permanent actions.</p>
+        <div class="flex gap-3">
+          <button onclick="deleteAllUsers()" class="bdr rounded-lg px-4 py-2 text-xs"><i class="fa-solid fa-users mr-1"></i>Delete All Users</button>
+          <button onclick="deleteAllResellers()" class="bdr rounded-lg px-4 py-2 text-xs"><i class="fa-solid fa-store mr-1"></i>Delete All Resellers</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- EDIT USER MODAL -->
+<div id="eUM" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
+<div class="movl absolute inset-0" onclick="closeModal('eUM')"></div>
+<div class="mbox gl rounded-2xl w-full max-w-md p-6 relative z-10">
+  <div class="flex items-center justify-between mb-4"><h3 class="text-sm font-bold text-hxe-bright"><i class="fa-solid fa-pen text-hxe-accent mr-2"></i>Edit User</h3><button onclick="closeModal('eUM')" class="text-hxe-dim hover:text-hxe-txt cursor-pointer"><i class="fa-solid fa-xmark"></i></button></div>
+  <input type="hidden" id="euO">
+  <div class="space-y-3">
+    <div><label class="block text-xs text-hxe-dim mb-1">Username</label><input id="euN" type="text" class="hi w-full rounded-lg px-3 py-2.5 text-sm"></div>
+    <div><label class="block text-xs text-hxe-dim mb-1">Password</label><input id="euP" type="text" class="hi w-full rounded-lg px-3 py-2.5 text-sm" placeholder="New password (blank = keep)"></div>
+    <div><label class="block text-xs text-hxe-dim mb-1">Expiry</label><select id="euE" class="sel w-full rounded-lg"><option value="604800000">7 Days</option><option value="1296000000">15 Days</option><option value="2592000000">30 Days</option><option value="7776000000">90 Days</option><option value="31536000000">1 Year</option><option value="0">Lifetime</option></select></div>
+    <div><label class="block text-xs text-hxe-dim mb-1">Status</label><select id="euS" class="sel w-full rounded-lg"><option value="active">Active</option><option value="disabled">Disabled</option><option value="locked">Locked (HWID)</option></select></div>
+    <div><label class="block text-xs text-hxe-dim mb-1">Note</label><input id="euNt" type="text" class="hi w-full rounded-lg px-3 py-2.5 text-sm" placeholder="Note"></div>
+    <div class="flex gap-3 pt-2">
+      <button onclick="saveUserEdit()" class="ba rounded-lg py-2.5 text-sm flex-1">Save</button>
+      <button onclick="resetUserHWID()" class="bgt rounded-lg py-2.5 text-sm"><i class="fa-solid fa-fingerprint mr-1"></i>Reset HWID</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EDIT RESELLER MODAL -->
+<div id="eRM" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
+<div class="movl absolute inset-0" onclick="closeModal('eRM')"></div>
+<div class="mbox gl rounded-2xl w-full max-w-md p-6 relative z-10">
+  <div class="flex items-center justify-between mb-4"><h3 class="text-sm font-bold text-hxe-bright"><i class="fa-solid fa-pen text-hxe-purple mr-2"></i>Edit Reseller</h3><button onclick="closeModal('eRM')" class="text-hxe-dim hover:text-hxe-txt cursor-pointer"><i class="fa-solid fa-xmark"></i></button></div>
+  <input type="hidden" id="erO">
+  <div class="space-y-3">
+    <div><label class="block text-xs text-hxe-dim mb-1">Username</label><input id="erN" type="text" class="hi w-full rounded-lg px-3 py-2.5 text-sm"></div>
+    <div><label class="block text-xs text-hxe-dim mb-1">Password</label><input id="erP" type="text" class="hi w-full rounded-lg px-3 py-2.5 text-sm" placeholder="New password (blank = keep)"></div>
+    <div><label class="block text-xs text-hxe-dim mb-1">Key Limit</label><input id="erL" type="number" min="1" class="hi w-full rounded-lg px-3 py-2.5 text-sm"></div>
+    <div><label class="block text-xs text-hxe-dim mb-1">Status</label><select id="erS" class="sel w-full rounded-lg"><option value="active">Active</option><option value="disabled">Disabled</option></select></div>
+    <button onclick="saveResellerEdit()" class="ba rounded-lg py-2.5 text-sm w-full mt-2">Save</button>
+  </div>
+</div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div id="cM" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4">
+<div class="movl absolute inset-0" onclick="closeModal('cM')"></div>
+<div class="mbox gl rounded-2xl w-full max-w-sm p-6 relative z-10 text-center">
+  <div class="w-14 h-14 rounded-full bg-hxe-red/10 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-triangle-exclamation text-hxe-red text-xl"></i></div>
+  <h3 id="cTi" class="text-sm font-bold text-hxe-bright mb-2">Confirm</h3>
+  <p id="cMg" class="text-xs text-hxe-dim mb-6">Are you sure?</p>
+  <div class="flex gap-3"><button onclick="closeModal('cM')" class="bgt flex-1 rounded-lg py-2.5 text-sm">Cancel</button><button id="cBt" class="bdr flex-1 rounded-lg py-2.5 text-sm">Confirm</button></div>
+</div>
+</div>
+
+<div id="tC" class="fixed top-4 right-4 z-[70] space-y-2 w-80"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════
+// ADMIN PANEL - FULL CONTROL WITH FILTER TABS
+// ══════════════════════════════════════════════════════════════════════
+
+var DB_URL = "https://hxe-aiv8-default-rtdb.firebaseio.com";
+var DB_SECRET = "yl9yv7xV2YjScbBwRYGsN9pbTofnnEtehvdUAKVb";
+var NOW = function(){ return Date.now(); };
+
+var state = {
+    admin: null,
+    currentPage: 'dash',
+    users: {},
+    resellers: {},
+    log: [],
+    deleteCallback: null,
+    filter: 'all'
+};
+
+function fbGet(p) { return fetch(DB_URL + '/' + p + '.json?auth=' + DB_SECRET).then(r => r.json()).catch(() => null); }
+function fbPost(p, d) { return fetch(DB_URL + '/' + p + '.json?auth=' + DB_SECRET, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) }).then(r => r.json()).catch(() => null); }
+function fbPatch(p, d) { return fetch(DB_URL + '/' + p + '.json?auth=' + DB_SECRET, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) }).then(r => r.json()).catch(() => null); }
+function fbDelete(p) { return fetch(DB_URL + '/' + p + '.json?auth=' + DB_SECRET, { method: 'DELETE' }).then(() => true).catch(() => false); }
+
+function showToast(m, t) {
+    t = t || 'info';
+    var c = document.getElementById('tC');
+    var cl = { success: 'border-hxe-green/30 bg-hxe-green/10 text-hxe-green', error: 'border-hxe-red/30 bg-hxe-red/10 text-hxe-red', info: 'border-hxe-accent/30 bg-hxe-accent/10 text-hxe-accent' };
+    var ic = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+    var el = document.createElement('div');
+    el.className = 'tst flex items-center gap-3 px-4 py-3 rounded-lg border text-sm ' + (cl[t] || cl.info);
+    el.innerHTML = '<i class="fa-solid ' + (ic[t] || ic.info) + '"></i><span class="flex-1">' + m + '</span>';
+    c.appendChild(el);
+    setTimeout(function() { el.classList.add('tso'); setTimeout(function() { el.remove(); }, 300); }, 3000);
+}
+
+function showConfirm(t, m, cb) {
+    document.getElementById('cTi').textContent = t;
+    document.getElementById('cMg').textContent = m;
+    state.deleteCallback = cb;
+    var btn = document.getElementById('cBt');
+    var nb = btn.cloneNode(true);
+    btn.parentNode.replaceChild(nb, btn);
+    nb.id = 'cBt';
+    nb.addEventListener('click', function() { closeModal('cM'); if (state.deleteCallback) { state.deleteCallback(); state.deleteCallback = null; } });
+    openModal('cM');
+}
+
+function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+function setFilter(f) {
+    state.filter = f;
+    document.querySelectorAll('.filter-tab').forEach(function(el) {
+        el.classList.toggle('active', el.dataset.filter === f);
+    });
+    renderUsers();
+}
+
+function loginAdmin() {
+    var u = document.getElementById('lU').value.trim();
+    var p = document.getElementById('lP').value;
+    var btn = document.getElementById('lBtn');
+    var e = document.getElementById('lE');
+    if (!u || !p) { e.textContent = 'Fill all fields.'; e.classList.remove('hidden'); return; }
+    btn.disabled = true; btn.textContent = 'LOGGING IN...';
+    if (u === 'HYDRA' && p === '2255') {
+        state.admin = { username: 'HYDRA' };
+        sessionStorage.setItem('ha', 'HYDRA');
+        enterAdmin();
+        fbGet('admins').then(function(a) {
+            if (!a) a = {};
+            var f = false;
+            for (var id in a) { if (a[id].username === 'HYDRA') { f = true; fbPatch('admins/' + id, { db_secret: DB_SECRET }); break; } }
+            if (!f) { fbPost('admins', { username: 'HYDRA', password: '2255', created_at: NOW(), db_secret: DB_SECRET }); }
+        });
+        return;
+    }
+    fbGet('admins').then(function(a) {
+        if (!a) { e.textContent = 'Invalid credentials.'; e.classList.remove('hidden'); btn.disabled = false; btn.textContent = 'Login'; return; }
+        var fid = null;
+        for (var id in a) { if (a[id].username === u) { fid = id; break; } }
+        if (!fid) { e.textContent = 'Admin not found.'; e.classList.remove('hidden'); btn.disabled = false; btn.textContent = 'Login'; return; }
+        if (p !== a[fid].password) { e.textContent = 'Wrong password.'; e.classList.remove('hidden'); btn.disabled = false; btn.textContent = 'Login'; return; }
+        state.admin = { username: u };
+        sessionStorage.setItem('ha', u);
+        enterAdmin();
+    }).catch(function() {
+        e.textContent = 'Cannot connect to database.';
+        e.classList.remove('hidden');
+        btn.disabled = false;
+        btn.textContent = 'Login';
+    });
+}
+
+function enterAdmin() {
+    document.getElementById('LS').classList.add('hidden');
+    document.getElementById('MA').classList.remove('hidden');
+    document.getElementById('sU').textContent = state.admin.username;
+    document.getElementById('lBtn').disabled = false;
+    document.getElementById('lBtn').textContent = 'Login';
+    refreshData();
+}
+
+function logoutAdmin() {
+    state.admin = null;
+    sessionStorage.removeItem('ha');
+    document.getElementById('MA').classList.add('hidden');
+    document.getElementById('LS').classList.remove('hidden');
+    document.getElementById('lU').value = 'HYDRA';
+    document.getElementById('lP').value = '2255';
+    document.getElementById('lE').classList.add('hidden');
+}
+
+function refreshData() {
+    var badge = document.getElementById('cBadge');
+    badge.className = 'cbadge cb-ok';
+    badge.innerHTML = '<div class="pdot bg-hxe-green"></div>Connected';
+    Promise.all([
+        fbGet('users').then(function(d) { state.users = d || {}; }),
+        fbGet('resellers').then(function(d) { state.resellers = d || {}; }),
+        fbGet('reseller_log').then(function(d) { state.log = d ? Object.values(d).sort(function(a, b) { return (b.time || 0) - (a.time || 0); }) : []; })
+    ]).then(function() {
+        renderDashboard();
+        if (state.currentPage === 'users') renderUsers();
+        if (state.currentPage === 'resellers') renderResellers();
+        startCountdowns();
+    }).catch(function() {
+        badge.className = 'cbadge cb-no';
+        badge.innerHTML = '<div class="pdot bg-hxe-red"></div>Offline';
+        renderDashboard();
+        if (state.currentPage === 'users') renderUsers();
+        if (state.currentPage === 'resellers') renderResellers();
+    });
+}
+
+function switchPage(p) {
+    state.currentPage = p;
+    var t = { dash: 'Dashboard', users: 'Users', resellers: 'Resellers', settings: 'Settings' };
+    document.getElementById('pT').textContent = t[p] || p;
+    ['Dash', 'Users', 'Resellers', 'Settings'].forEach(function(x) { document.getElementById('p' + x).classList.add('hidden'); });
+    var el = document.getElementById('p' + p.charAt(0).toUpperCase() + p.slice(1));
+    if (el) { el.classList.remove('hidden'); el.style.animation = 'none'; el.offsetHeight; el.style.animation = ''; }
+    document.querySelectorAll('.ni').forEach(function(b) { b.classList.toggle('act', b.dataset.p === p); });
+    if (p === 'users') renderUsers();
+    if (p === 'resellers') renderResellers();
+}
+
+function renderDashboard() {
+    var u = Object.values(state.users);
+    var r = Object.values(state.resellers);
+    var n = NOW();
+    var active = u.filter(function(x) { return x.status !== 'disabled' && x.status !== 'locked' && (!x.expiry || x.expiry >= 9999999999999 || x.expiry > n); }).length;
+    var expired = u.filter(function(x) { return x.status !== 'disabled' && x.status !== 'locked' && x.expiry && x.expiry < 9999999999999 && x.expiry <= n; }).length;
+    var locked = u.filter(function(x) { return x.status === 'locked'; }).length;
+    var resellerCreated = u.filter(function(x) { return x.source === 'reseller'; }).length;
+    
+    document.getElementById('sG').innerHTML = [
+        { l: 'Total Users', v: u.length, i: 'fa-users', c: 'text-hxe-accent', b: 'bg-hxe-accent/10' },
+        { l: 'Active', v: active, i: 'fa-circle-check', c: 'text-hxe-green', b: 'bg-hxe-green/10' },
+        { l: 'Expired', v: expired, i: 'fa-clock', c: 'text-hxe-yellow', b: 'bg-hxe-yellow/10' },
+        { l: 'Locked (HWID)', v: locked, i: 'fa-lock', c: 'text-hxe-red', b: 'bg-hxe-red/10' },
+        { l: 'Reseller Created', v: resellerCreated, i: 'fa-store', c: 'text-hxe-purple', b: 'bg-hxe-purple/10' }
+    ].map(function(s) {
+        return '<div class="sc gl rounded-xl p-5"><div class="flex items-center justify-between mb-3"><span class="text-xs text-hxe-dim font-medium">' + s.l + '</span><div class="w-8 h-8 rounded-lg ' + s.b + ' flex items-center justify-center"><i class="fa-solid ' + s.i + ' ' + s.c + ' text-sm"></i></div></div><div class="text-3xl font-extrabold ' + s.c + ' font-mono">' + s.v + '</div></div>';
+    }).join('');
+    
+    var recent = u.sort(function(a, b) { return (b.registered_at || 0) - (a.registered_at || 0); }).slice(0, 8);
+    document.getElementById('rU').innerHTML = recent.length ?
+        '<table class="dt w-full text-xs"><thead><tr><th class="px-3 py-2 text-left">Username</th><th class="px-3 py-2 text-left">Status</th><th class="px-3 py-2 text-left">Expiry</th><th class="px-3 py-2 text-left">Source</th></tr></thead><tbody>' +
+        recent.map(function(u) {
+            var s = u.status === 'disabled' ? 'disabled' : (u.status === 'locked' ? 'locked' : (u.expiry && u.expiry < 9999999999999 && u.expiry <= NOW() ? 'expired' : 'active'));
+            return '<tr><td class="px-3 py-2 font-mono text-hxe-txt">' + u._name + '</td><td class="px-3 py-2"><span class="bdg b-' + (s === 'active' ? 'a' : s === 'expired' ? 'e' : s === 'locked' ? 'd' : 'd') + '">' + s + '</span></td><td class="px-3 py-2"><span class="cdwn" data-exp="' + (u.expiry || 0) + '">' + formatExpiry(u.expiry) + '</span></td><td class="px-3 py-2"><span class="bdg ' + (u.source === 'reseller' ? 'b-r' : 'b-a') + '">' + (u.source || 'admin') + '</span></td></tr>';
+        }).join('') +
+        '</tbody></table>' :
+        '<p class="text-hxe-dim text-xs text-center py-6">No users yet.</p>';
+    startCountdowns();
+}
+
+function createUser() {
+    var n = document.getElementById('cUN').value.trim();
+    var p = document.getElementById('cPW').value;
+    var ev = document.getElementById('cEX').value;
+    var nt = document.getElementById('cNT').value.trim();
+    if (!n || !p) { showToast('Fill username and password', 'error'); return; }
+    if (state.users[n]) { showToast('Username exists', 'error'); return; }
+    var expiry = ev === '0' ? 9999999999999 : NOW() + parseInt(ev);
+    fbPatch('users/' + n, {
+        password: p,
+        expiry: expiry,
+        registered_at: NOW(),
+        last_login: null,
+        hwid: null,
+        status: 'active',
+        source: 'admin',
+        note: nt
+    }).then(function() {
+        document.getElementById('cUN').value = '';
+        document.getElementById('cPW').value = '';
+        document.getElementById('cNT').value = '';
+        refreshData();
+        showToast('User "' + n + '" created', 'success');
+    });
+}
+
+function renderUsers() {
+    var search = (document.getElementById('uS') ? document.getElementById('uS').value : '').toLowerCase();
+    var entries = Object.keys(state.users).map(function(k) { var u = state.users[k]; u._name = k; return u; });
+    
+    // Apply filter
+    var filter = state.filter;
+    if (filter === 'active') {
+        entries = entries.filter(function(u) { return u.status === 'active' && (!u.expiry || u.expiry >= 9999999999999 || u.expiry > NOW()); });
+    } else if (filter === 'expired') {
+        entries = entries.filter(function(u) { return u.status !== 'disabled' && u.status !== 'locked' && u.expiry && u.expiry < 9999999999999 && u.expiry <= NOW(); });
+    } else if (filter === 'locked') {
+        entries = entries.filter(function(u) { return u.status === 'locked'; });
+    } else if (filter === 'reseller') {
+        entries = entries.filter(function(u) { return u.source === 'reseller'; });
+    } else if (filter === 'admin') {
+        entries = entries.filter(function(u) { return u.source !== 'reseller'; });
+    }
+    
+    if (search) entries = entries.filter(function(u) { return u._name.toLowerCase().includes(search) || (u.note || '').toLowerCase().includes(search) || (u.source || '').includes(search); });
+    entries.sort(function(a, b) { return (b.registered_at || 0) - (a.registered_at || 0); });
+    var tb = document.getElementById('uB');
+    var em = document.getElementById('uE');
+    if (!entries.length) { tb.innerHTML = ''; em.classList.remove('hidden'); return; }
+    em.classList.add('hidden');
+    tb.innerHTML = entries.map(function(u) {
+        var st = u.status === 'disabled' ? 'disabled' : (u.status === 'locked' ? 'locked' : (u.expiry && u.expiry < 9999999999999 && u.expiry <= NOW() ? 'expired' : 'active'));
+        var hs = u.hwid ? '<span class="bdg b-h" title="' + u.hwid + '"><i class="fa-solid fa-fingerprint mr-1"></i>' + u.hwid.substring(0, 10) + '...</span>' : '<span class="text-hxe-dim">—</span>';
+        var pw = u.password || '••••••';
+        if (pw.length > 20) pw = '••••••';
+        var name = u._name.replace(/'/g, "\\'");
+        var note = u.note || '—';
+        return '<tr>' +
+            '<td class="px-4 py-3 font-mono text-sm text-hxe-txt">' + u._name + '</td>' +
+            '<td class="px-4 py-3 font-mono text-xs text-hxe-dim">' + pw + '</td>' +
+            '<td class="px-4 py-3"><span class="bdg b-' + (st === 'active' ? 'a' : st === 'expired' ? 'e' : 'd') + '">' + st + '</span></td>' +
+            '<td class="px-4 py-3 text-xs"><span class="cdwn" data-exp="' + (u.expiry || 0) + '">' + formatExpiry(u.expiry) + '</span></td>' +
+            '<td class="px-4 py-3 text-xs">' + hs + '</td>' +
+            '<td class="px-4 py-3 text-xs text-hxe-dim">' + note + '</td>' +
+            '<td class="px-4 py-3"><span class="bdg ' + (u.source === 'reseller' ? 'b-r' : 'b-a') + '">' + (u.source || 'admin') + '</span></td>' +
+            '<td class="px-4 py-3 text-xs text-hxe-dim">' + formatDate(u.registered_at) + '</td>' +
+            '<td class="px-4 py-3 text-right">' +
+            '<button onclick="editUser(\'' + name + '\')" class="text-hxe-dim hover:text-hxe-accent p-1 cursor-pointer" title="Edit"><i class="fa-solid fa-pen"></i></button>' +
+            (u.hwid ? '<button onclick="resetHWID(\'' + name + '\')" class="text-hxe-dim hover:text-hxe-orange p-1 cursor-pointer" title="Reset HWID"><i class="fa-solid fa-fingerprint"></i></button>' : '') +
+            (u.status === 'disabled' ? '<button onclick="toggleUser(\'' + name + '\',\'active\')" class="text-hxe-dim hover:text-hxe-green p-1 cursor-pointer"><i class="fa-solid fa-circle-check"></i></button>' : '<button onclick="toggleUser(\'' + name + '\',\'disabled\')" class="text-hxe-dim hover:text-hxe-yellow p-1 cursor-pointer"><i class="fa-solid fa-ban"></i></button>') +
+            '<button onclick="deleteUser(\'' + name + '\')" class="text-hxe-dim hover:text-hxe-red p-1 cursor-pointer"><i class="fa-solid fa-trash"></i></button>' +
+            '</td></tr>';
+    }).join('');
+    startCountdowns();
+}
+
+function editUser(name) {
+    var u = state.users[name];
+    if (!u) return;
+    document.getElementById('euO').value = name;
+    document.getElementById('euN').value = name;
+    document.getElementById('euP').value = '';
+    document.getElementById('euS').value = u.status === 'disabled' ? 'disabled' : (u.status === 'locked' ? 'locked' : 'active');
+    document.getElementById('euNt').value = u.note || '';
+    if (!u.expiry || u.expiry >= 9999999999999) document.getElementById('euE').value = '0';
+    else {
+        var rem = u.expiry - NOW();
+        var opts = [31536000000, 7776000000, 2592000000, 1296000000, 604800000];
+        var set = false;
+        for (var i = 0; i < opts.length; i++) {
+            if (rem > opts[i] * 0.8) { document.getElementById('euE').value = String(opts[i]); set = true; break; }
+        }
+        if (!set) document.getElementById('euE').value = '2592000000';
+    }
+    openModal('eUM');
+}
+
+function saveUserEdit() {
+    var old = document.getElementById('euO').value;
+    var n = document.getElementById('euN').value.trim();
+    var p = document.getElementById('euP').value;
+    var ev = document.getElementById('euE').value;
+    var st = document.getElementById('euS').value;
+    var nt = document.getElementById('euNt').value.trim();
+    if (!n) { showToast('Username required', 'error'); return; }
+    var expiry = ev === '0' ? 9999999999999 : NOW() + parseInt(ev);
+    var u = state.users[old];
+    if (!u) return;
+    var data = { expiry: expiry, status: st, source: u.source || 'admin', registered_at: u.registered_at, last_login: u.last_login, hwid: u.hwid, note: nt };
+    if (p) data.password = p;
+    else data.password = u.password;
+    if (n !== old) {
+        fbGet('users/' + old).then(function(od) {
+            if (!od) { showToast('Error: user not found', 'error'); return; }
+            fbDelete('users/' + old).then(function() { fbPatch('users/' + n, data).then(function() { refreshData(); closeModal('eUM'); showToast('User updated', 'success'); }); });
+        });
+    } else {
+        fbPatch('users/' + n, data).then(function() { refreshData(); closeModal('eUM'); showToast('User updated', 'success'); });
+    }
+}
+
+function resetHWID(name) {
+    showConfirm('Reset HWID', 'Remove HWID lock from "' + name + '"?', function() {
+        fbPatch('users/' + name, { hwid: null, status: 'active' }).then(function() { refreshData(); showToast('HWID reset', 'success'); });
+    });
+}
+
+function toggleUser(n, s) { fbPatch('users/' + n, { status: s }).then(function() { refreshData(); showToast('User ' + s, 'success'); }); }
+function deleteUser(n) { showConfirm('Delete User', 'Delete "' + n + '" permanently?', function() { fbDelete('users/' + n).then(function() { refreshData(); showToast('Deleted', 'success'); }); }); }
+
+// ═══════════ RESELLERS ═══════════
+function createReseller() {
+    var n = document.getElementById('rCN').value.trim();
+    var p = document.getElementById('rCP').value;
+    var l = parseInt(document.getElementById('rCL').value) || 50;
+    if (!n || !p) { showToast('Fill all fields', 'error'); return; }
+    if (state.resellers[n]) { showToast('Reseller exists', 'error'); return; }
+    fbPatch('resellers/' + n, { password: p, key_limit: l, keys_used: 0, status: 'active', created_at: NOW() }).then(function() {
+        document.getElementById('rCN').value = '';
+        document.getElementById('rCP').value = '';
+        refreshData();
+        showToast('Reseller "' + n + '" created', 'success');
+    });
+}
+
+function renderResellers() {
+    var entries = Object.keys(state.resellers).map(function(k) { var r = state.resellers[k]; r._name = k; return r; }).sort(function(a, b) { return (b.created_at || 0) - (a.created_at || 0); });
+    var tb = document.getElementById('rB');
+    var em = document.getElementById('rE');
+    if (!entries.length) { tb.innerHTML = ''; em.classList.remove('hidden'); } else {
+        em.classList.add('hidden');
+        tb.innerHTML = entries.map(function(r) {
+            var rem = r.key_limit - (r.keys_used || 0);
+            var pw = r.password || '••••••';
+            if (pw.length > 20) pw = '••••••';
+            var name = r._name.replace(/'/g, "\\'");
+            return '<tr>' +
+                '<td class="px-4 py-3 font-mono text-sm text-hxe-txt">' + r._name + '</td>' +
+                '<td class="px-4 py-3 font-mono text-xs text-hxe-dim">' + pw + '</td>' +
+                '<td class="px-4 py-3 text-xs font-mono">' + r.key_limit + '</td>' +
+                '<td class="px-4 py-3 text-xs font-mono">' + (r.keys_used || 0) + '</td>' +
+                '<td class="px-4 py-3 text-xs font-mono ' + (rem > 0 ? 'text-hxe-green' : 'text-hxe-red') + '">' + rem + '</td>' +
+                '<td class="px-4 py-3"><span class="bdg ' + (r.status === 'disabled' ? 'b-d' : 'b-a') + '">' + r.status + '</span></td>' +
+                '<td class="px-4 py-3 text-right">' +
+                '<button onclick="editReseller(\'' + name + '\')" class="text-hxe-dim hover:text-hxe-purple p-1 cursor-pointer"><i class="fa-solid fa-pen"></i></button>' +
+                (r.status === 'disabled' ? '<button onclick="toggleReseller(\'' + name + '\',\'active\')" class="text-hxe-dim hover:text-hxe-green p-1 cursor-pointer"><i class="fa-solid fa-circle-check"></i></button>' : '<button onclick="toggleReseller(\'' + name + '\',\'disabled\')" class="text-hxe-dim hover:text-hxe-yellow p-1 cursor-pointer"><i class="fa-solid fa-ban"></i></button>') +
+                '<button onclick="deleteReseller(\'' + name + '\')" class="text-hxe-dim hover:text-hxe-red p-1 cursor-pointer"><i class="fa-solid fa-trash"></i></button>' +
+                '</td></tr>';
+        }).join('');
+    }
+    var lb = document.getElementById('rLB');
+    var le = document.getElementById('rLE');
+    if (!state.log || !state.log.length) { lb.innerHTML = ''; le.classList.remove('hidden'); } else {
+        le.classList.add('hidden');
+        lb.innerHTML = state.log.slice(0, 50).map(function(l) {
+            return '<tr>' +
+                '<td class="px-4 py-3 font-mono text-xs text-hxe-purple">' + (l.reseller || '—') + '</td>' +
+                '<td class="px-4 py-3 font-mono text-xs text-hxe-txt">' + (l.username || '—') + '</td>' +
+                '<td class="px-4 py-3 font-mono text-xs text-hxe-dim">' + (l.password || '—') + '</td>' +
+                '<td class="px-4 py-3 text-xs text-hxe-dim">' + (l.note || '—') + '</td>' +
+                '<td class="px-4 py-3 text-xs"><span class="cdwn" data-exp="' + (l.expiry || 0) + '">' + formatExpiry(l.expiry) + '</span></td>' +
+                '<td class="px-4 py-3 text-xs text-hxe-dim">' + formatDate(l.time) + '</td>' +
+                '</tr>';
+        }).join('');
+    }
+    startCountdowns();
+}
+
+function editReseller(name) {
+    var r = state.resellers[name];
+    if (!r) return;
+    document.getElementById('erO').value = name;
+    document.getElementById('erN').value = name;
+    document.getElementById('erP').value = '';
+    document.getElementById('erL').value = r.key_limit;
+    document.getElementById('erS').value = r.status === 'disabled' ? 'disabled' : 'active';
+    openModal('eRM');
+}
+
+function saveResellerEdit() {
+    var old = document.getElementById('erO').value;
+    var n = document.getElementById('erN').value.trim();
+    var p = document.getElementById('erP').value;
+    var l = parseInt(document.getElementById('erL').value) || 50;
+    var st = document.getElementById('erS').value;
+    if (!n) { showToast('Username required', 'error'); return; }
+    var r = state.resellers[old];
+    if (!r) return;
+    var data = { key_limit: l, status: st, created_at: r.created_at, keys_used: r.keys_used };
+    if (p) data.password = p;
+    else data.password = r.password;
+    if (n !== old) {
+        fbGet('resellers/' + old).then(function(od) {
+            if (!od) { showToast('Error: reseller not found', 'error'); return; }
+            fbDelete('resellers/' + old).then(function() { fbPatch('resellers/' + n, data).then(function() { refreshData(); closeModal('eRM'); showToast('Reseller updated', 'success'); }); });
+        });
+    } else {
+        fbPatch('resellers/' + n, data).then(function() { refreshData(); closeModal('eRM'); showToast('Reseller updated', 'success'); });
+    }
+}
+
+function toggleReseller(n, s) { fbPatch('resellers/' + n, { status: s }).then(function() { refreshData(); showToast('Reseller ' + s, 'success'); }); }
+
+function deleteReseller(n) {
+    showConfirm('Delete Reseller', 'Delete "' + n + '"? Users created by this reseller will REMAIN in the system.', function() {
+        fbDelete('resellers/' + n).then(function() {
+            refreshData();
+            showToast('Reseller deleted, their users remain in system', 'success');
+        });
+    });
+}
+
+function changeAdminPassword() {
+    var o = document.getElementById('sOP').value;
+    var n = document.getElementById('sNP').value;
+    var n2 = document.getElementById('sN2').value;
+    if (!o || !n) { showToast('Fill all fields', 'info'); return; }
+    if (n !== n2) { showToast('Passwords dont match', 'error'); return; }
+    fbGet('admins').then(function(a) {
+        if (!a) { showToast('Error', 'error'); return; }
+        var aid = null,
+            cur = '';
+        for (var id in a) { if (a[id].username === state.admin.username) { aid = id;
+                cur = a[id].password; break; } }
+        if (!aid) { showToast('Admin not found', 'error'); return; }
+        if (o !== cur) { showToast('Wrong current password', 'error'); return; }
+        fbPatch('admins/' + aid, { password: n }).then(function() {
+            document.getElementById('sOP').value = '';
+            document.getElementById('sNP').value = '';
+            document.getElementById('sN2').value = '';
+            showToast('Password updated', 'success');
+        });
+    });
+}
+
+function deleteAllUsers() { showConfirm('DELETE ALL USERS', 'This will delete ALL users permanently!', function() { fbDelete('users').then(function() { refreshData(); showToast('All users deleted', 'success'); }); }); }
+function deleteAllResellers() { showConfirm('DELETE ALL RESELLERS', 'This will delete ALL resellers permanently! Users will REMAIN.', function() { fbDelete('resellers').then(function() { refreshData(); showToast('All resellers deleted', 'success'); }); }); }
+
+function formatExpiry(e) {
+    if (!e || e === 0) return '<span class="text-hxe-dim">—</span>';
+    if (e >= 9999999999999) return '<span class="text-hxe-green">Lifetime</span>';
+    if (e <= NOW()) return '<span class="text-hxe-red">Expired</span>';
+    return new Date(e).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function formatDate(ts) { if (!ts) return '—'; return new Date(ts).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); }
+
+function startCountdowns() {
+    document.querySelectorAll('.cdwn[data-exp]').forEach(function(el) {
+        var e = parseInt(el.dataset.exp);
+        if (!e || e === 0 || e >= 9999999999999) return;
+        if (e <= NOW()) { el.innerHTML = '<span class="text-hxe-red">Expired</span>'; return; }
+        var d = e - NOW();
+        var dd = Math.floor(d / 86400000);
+        var h = Math.floor((d % 86400000) / 3600000);
+        var m = Math.floor((d % 3600000) / 60000);
+        var s = Math.floor((d % 60000) / 1000);
+        var t = '';
+        if (dd > 0) t += dd + 'd ';
+        t += String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+        var c = 'text-hxe-green';
+        if (dd < 1) c = 'text-hxe-yellow';
+        if (d < 3600000) c = 'text-hxe-red';
+        el.innerHTML = '<span class="' + c + '">' + t + '</span>';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() { var s = sessionStorage.getItem('ha'); if (s) { state.admin = { username: s };
+        enterAdmin(); } });
+setInterval(startCountdowns, 1000);
+</script>
+</body>
+</html>
